@@ -1,17 +1,18 @@
 const socket = io();
 
-navigator.mediaDevices.getUserMedia({ video: true, audio: false }) 
-    .then((stream) => {
-        const localVideo = document.getElementById('localVideo');
-        localVideo.srcObject = stream;
+const remoteVideo = document.getElementById('remoteVideo');
+const mediaSource = new MediaSource();
+remoteVideo.src = URL.createObjectURL(mediaSource);
 
-        const mediaRecorder = new MediaRecorder(stream);
-        mediaRecorder.ondataavailable = (e) => {
-            socket.emit('video-stream', e.data);
+mediaSource.addEventListener('sourceopen', () => {
+    const sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="vp8"');
+
+    socket.on('video-stream', (data) => {
+        const blob = new Blob([data], { type: 'video/webm' });
+        const reader = new FileReader();
+        reader.onload = () => {
+            sourceBuffer.appendBuffer(new Uint8Array(reader.result));
         };
-        mediaRecorder.start(100);
-    })
-
-    .catch((error) => {
-        console.error('Erreur lors de la récupération du média');
+        reader.readAsArrayBuffer(blob);
     });
+});
