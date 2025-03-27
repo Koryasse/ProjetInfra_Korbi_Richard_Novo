@@ -13,9 +13,12 @@
             <p>Partagez vos moments en live avec une clarté incroyable</p>
         </div>
         <div>
-            <video src=""></video>
+            <video src="" id="localVideo" autoplay muted></video>
+            <video src="" id="remoteVideo" autoplay></video>
         </div>
     </main>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
     <footer>
         <div class="footer-txt">
             <div class="footer-txt-first">
